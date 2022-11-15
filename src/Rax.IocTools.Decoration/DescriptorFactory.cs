@@ -27,12 +27,12 @@ internal sealed class DescriptorFactory
         throw new ArgumentException("Uncovered condition");
     }
 
-    public ServiceDescriptor CreateUnAbstractedDescriptor()
-    {
-        ArgumentNullException.ThrowIfNull(ImplementationType);
+    // public ServiceDescriptor CreateUnAbstractedDescriptor()
+    // {
+    //     ArgumentNullException.ThrowIfNull(ImplementationType);
 
-        return new ServiceDescriptor(ImplementationType, ImplementationType, Lifetime);
-    }
+    //     return new ServiceDescriptor(ImplementationType, ImplementationType, Lifetime);
+    // }
 
     public void SetFactory(Func<IServiceProvider, object> factory)
     {

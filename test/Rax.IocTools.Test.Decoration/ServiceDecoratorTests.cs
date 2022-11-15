@@ -71,10 +71,30 @@ public class ServiceDecoratorTests
             new MessageProviderDecorator(subject)));
 
         var provider = services.BuildServiceProvider();
-        var service =  provider.GetRequiredService<Message>();
+        var service = provider.GetRequiredService<Message>();
 
         //ASSERT
         service.Content.Should().Be("Decorated: Decorated: Hello");
+    }
+
+    [Fact]
+    public void Decorate_with_double_decorators_by_object()
+    {
+        //ARRANGE
+        var services = new ServiceCollection();
+        services.AddSingleton<Message>();
+        services.AddSingleton<BaseMessageProvider>(new HelloMessageProvider());
+        var decorator = new ServiceDecorator(services);
+
+        //ACT
+        decorator.Decorate<BaseMessageProvider>((subject) =>
+            new MessageProviderDecorator(subject));
+
+        var provider = services.BuildServiceProvider();
+        var service = provider.GetRequiredService<Message>();
+
+        //ASSERT
+        service.Content.Should().Be("Decorated: Hello");
     }
 
     private ServiceDecorator ArrangeServicesWithExtraText(IServiceCollection services)
