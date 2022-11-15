@@ -9,15 +9,18 @@ public class ServiceDecoratorTests
 {
 
     [Fact]
-    public void Decorate_abstract_class_with_handler()
+    public void Decorate_generic_descriptor()
     {
         //ARRANGE
 
         var services = new ServiceCollection();
-        var decorator = ArrangeHelloMessageWithBase(services);
+        services.AddSingleton<Message>();
+        
+        //Creates a "generic" descriptor
+        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
 
         //ACT
-        decorator.Decorate<BaseMessageProvider>(subject => new MessageProviderDecorator(subject));
+        ServiceDecorator.Decorate<BaseMessageProvider>(services, subject => new MessageProviderDecorator(subject));
         var service = services.BuildServiceProvider().GetRequiredService<Message>();
 
         //ASSERT
@@ -25,50 +28,86 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    public void Decorate_with_string_extra_dependencies()
+    public void Decorate_single_generic_descriptor_should_throw()
     {
         //ARRANGE
         var services = new ServiceCollection();
-        var decorator = ArrangeHelloMessageWithBase(services);
+        services.AddSingleton<HelloMessageProvider>();
 
-        //ACT
-        decorator.Decorate<BaseMessageProvider>(subject =>
-            new MessageProviderDecoratorExtraDependencies(subject, "Extra: "));
+        //ACT & ASSERT
+        FluentActions.Invoking(
+            () => ServiceDecorator.Decorate<HelloMessageProvider>(services,
+                subject => new HelloMessageProviderDecorator(subject)))
+            .Should().Throw<ServiceDecorationException>();
+    }
+    
+    [Fact]
+    public void More_then_one_descriptor_per_service_type_should_throw()
+    {
+        //ARRANGE
+        var services = new ServiceCollection();
+        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
+        services.AddSingleton<BaseMessageProvider, MessageProviderDecorator>();
 
-        var service = services.BuildServiceProvider().GetRequiredService<Message>();
-
-        //ASSERT
-        service.Content.Should().Be("Extra: Hello");
+        //ACT & ASSERT
+        FluentActions.Invoking(
+                () => ServiceDecorator.Decorate<BaseMessageProvider>(services,
+                    subject => new MessageProviderDecorator(subject)))
+            .Should().Throw<ServiceDecorationException>();
     }
 
     [Fact]
-    public void Decorate_with_injected_extra_dependencies()
+    public void Decorate_object_descriptor()
     {
         //ARRANGE
         var services = new ServiceCollection();
-        var decorator = ArrangeServicesWithExtraText(services);
-
+        services.AddSingleton<Message>();
+        services.AddSingleton<BaseMessageProvider>(new HelloMessageProvider());
+        
         //ACT
-        decorator.Decorate<BaseMessageProvider>((subject, provider) =>
-            new MessageProviderDecoratorExtraDependencies(subject, provider.GetRequiredService<ExtraText>()));
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
+            new MessageProviderDecorator(subject));
 
-        var service = services.BuildServiceProvider().GetRequiredService<Message>();
+        var provider = services.BuildServiceProvider();
+        var service =  provider.GetRequiredService<Message>();
 
         //ASSERT
-        service.Content.Should().Be("Extra injected: Hello");
+        service.Content.Should().Be("Decorated: Hello");
     }
 
     [Fact]
-    public void Decorate_with_double_decorators_by_new()
+    public void Decorate_factory_descriptor()
     {
         //ARRANGE
         var services = new ServiceCollection();
-        var decorator = ArrangeServicesWithExtraText(services);
+        services.AddSingleton<Message>();
+        services.AddSingleton<BaseMessageProvider>(
+            provider => new HelloMessageProvider());
+        
+        //ACT
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
+            new MessageProviderDecorator(subject));
+
+        var provider = services.BuildServiceProvider();
+        var service =  provider.GetRequiredService<Message>();
+
+        //ASSERT
+        service.Content.Should().Be("Decorated: Hello");
+    }
+
+    [Fact]
+    public void Decorate_generic_descriptor_twice_with_new()
+    {
+        //ARRANGE
+        var services = new ServiceCollection();
+        services.AddSingleton<Message>();
+        services.AddSingleton<ExtraText>();
+        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
 
         //ACT
-        decorator.Decorate<BaseMessageProvider>((subject) =>
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
             new MessageProviderDecorator(
-            new MessageProviderDecorator(subject)));
+                new MessageProviderDecorator(subject)));
 
         var provider = services.BuildServiceProvider();
         var service = provider.GetRequiredService<Message>();
@@ -78,39 +117,106 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    public void Decorate_with_double_decorators_by_object()
+    public void Decorate_generic_descriptor_with_provider()
+    {
+        //ARRANGE
+        var services = new ServiceCollection();
+        services.AddSingleton<Message>();
+        services.AddSingleton<ExtraText>();
+        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
+
+        //ACT
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
+            new MessageProviderDecoratorExtraDependencies(subject, provider.GetRequiredService<ExtraText>()));
+
+        var service = services.BuildServiceProvider().GetRequiredService<Message>();
+
+        //ASSERT
+        service.Content.Should().Be("Extra injected: Hello");
+    }
+    
+    [Fact]
+    public void Decorate_object_descriptor_with_provider()
     {
         //ARRANGE
         var services = new ServiceCollection();
         services.AddSingleton<Message>();
         services.AddSingleton<BaseMessageProvider>(new HelloMessageProvider());
-        var decorator = new ServiceDecorator(services);
 
         //ACT
-        decorator.Decorate<BaseMessageProvider>((subject) =>
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
             new MessageProviderDecorator(subject));
 
-        var provider = services.BuildServiceProvider();
-        var service = provider.GetRequiredService<Message>();
+        var service = services.BuildServiceProvider().GetRequiredService<Message>();
 
         //ASSERT
         service.Content.Should().Be("Decorated: Hello");
     }
-
-    private ServiceDecorator ArrangeServicesWithExtraText(IServiceCollection services)
+    
+    [Fact]
+    public void Decorate_factory_descriptor_with_provider()
     {
+        //ARRANGE
+        var services = new ServiceCollection();
         services.AddSingleton<Message>();
-        services.AddSingleton<ExtraText>();
-        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
-        return new ServiceDecorator(services);
+        services.AddSingleton<BaseMessageProvider>(provider => new HelloMessageProvider());
+
+        //ACT
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
+            new MessageProviderDecorator(subject));
+
+        var service = services.BuildServiceProvider().GetRequiredService<Message>();
+
+        //ASSERT
+        service.Content.Should().Be("Decorated: Hello");
     }
-
-    private static ServiceDecorator ArrangeHelloMessageWithBase(IServiceCollection services)
+    
+    [Fact]
+    public void Decorate_provider_factory_descriptor_repeatedly()
     {
+        //ARRANGE
+        var services = new ServiceCollection();
         services.AddSingleton<Message>();
-        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
-        var decorator = new ServiceDecorator(services);
-        return decorator;
+        services.AddSingleton<BaseMessageProvider>(provider => new HelloMessageProvider());
+
+        //ACT
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
+            new MessageProviderDecorator(subject));
+        
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
+            new MessageProviderDecorator(subject));
+        
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
+            new MessageProviderDecorator(subject));
+
+        var service = services.BuildServiceProvider().GetRequiredService<Message>();
+
+        //ASSERT
+        service.Content.Should().Be("Decorated: Decorated: Decorated: Hello");
+    }
+    
+    [Fact]
+    public void Decorate_generic_descriptor_repeatedly()
+    {
+        //ARRANGE
+        var services = new ServiceCollection();
+        services.AddSingleton<Message>();
+        services.AddSingleton<BaseMessageProvider,HelloMessageProvider>();
+
+        //ACT
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
+            new MessageProviderDecorator(subject));
+        
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
+            new MessageProviderDecorator(subject));
+        
+        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
+            new MessageProviderDecorator(subject));
+
+        var service = services.BuildServiceProvider().GetRequiredService<Message>();
+
+        //ASSERT
+        service.Content.Should().Be("Decorated: Decorated: Decorated: Hello");
     }
 }
 
@@ -167,26 +273,25 @@ internal class MessageProviderDecorator : BaseMessageProvider
     }
 }
 
-internal class InjectionMessageProviderDecorator : BaseMessageProvider
-{
-    private readonly BaseMessageProvider _provider;
-
-    public InjectionMessageProviderDecorator(BaseMessageProvider provider)
-    {
-        _provider = provider;
-    }
-
-    public override string GetMessage()
-    {
-        return "Injection " + _provider.GetMessage();
-    }
-}
-
 internal class HelloMessageProvider : BaseMessageProvider
 {
     public override string GetMessage()
     {
         return "Hello";
+    }
+}
+
+internal class HelloMessageProviderDecorator : HelloMessageProvider
+{
+    private readonly HelloMessageProvider _helloMessageProvider;
+
+    public HelloMessageProviderDecorator(HelloMessageProvider helloMessageProvider)
+    {
+        _helloMessageProvider = helloMessageProvider;
+    }
+    public override string GetMessage()
+    {
+        return "Hello" + _helloMessageProvider.GetMessage();
     }
 }
 
