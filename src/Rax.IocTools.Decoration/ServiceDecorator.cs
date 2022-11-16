@@ -14,9 +14,11 @@ internal static class ServiceDecorator
     public static void Decorate<T>(IServiceCollection services, Func<T, IServiceProvider, T> decoration)
     {
         var subjectDescriptor = GetRequiredSubjectDescriptor<T>(services);
-        services.Remove(subjectDescriptor);
+        
         var newDescriptor = GetDecoratedServiceDescriptor(services, decoration, subjectDescriptor);
+
         services.Add(newDescriptor);
+        services.Remove(subjectDescriptor);
     }
     
     /// <summary>
@@ -28,16 +30,16 @@ internal static class ServiceDecorator
     public static void Decorate<T>(IServiceCollection services, Func<T, T> decoration)
     {
         var subjectDescriptor = GetRequiredSubjectDescriptor<T>(services);
-        services.Remove(subjectDescriptor);
 
-        T AdapterDecoration(T subject, IServiceProvider provider)
+        T AdaptedDecoration(T subject, IServiceProvider provider)
         {
             return decoration(subject);
         }
         
-        var newDescriptor = GetDecoratedServiceDescriptor<T>(services, AdapterDecoration, subjectDescriptor);
+        var newDescriptor = GetDecoratedServiceDescriptor<T>(services, AdaptedDecoration, subjectDescriptor);
 
         services.Add(newDescriptor);
+        services.Remove(subjectDescriptor);
     }
 
     private static ServiceDescriptor GetDecoratedServiceDescriptor<T>(
