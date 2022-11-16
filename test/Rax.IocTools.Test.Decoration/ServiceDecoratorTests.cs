@@ -14,10 +14,10 @@ public class ServiceDecoratorTests
         //ARRANGE
 
         var services = new ServiceCollection();
-        services.AddSingleton<Message>();
+        services.AddTransient<Message>();
         
         //Creates a "generic" descriptor
-        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
+        services.AddTransient<BaseMessageProvider, HelloMessageProvider>();
 
         //ACT
         ServiceDecorator.Decorate<BaseMessageProvider>(services, subject => new MessageProviderDecorator(subject));
@@ -46,8 +46,8 @@ public class ServiceDecoratorTests
     {
         //ARRANGE
         var services = new ServiceCollection();
-        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
-        services.AddSingleton<BaseMessageProvider, MessageProviderDecorator>();
+        services.AddScoped<BaseMessageProvider, HelloMessageProvider>();
+        services.AddScoped<BaseMessageProvider, MessageProviderDecorator>();
 
         //ACT & ASSERT
         FluentActions.Invoking(
@@ -57,22 +57,22 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    public void Decorate_object_descriptor()
+    public void Decorate_non_abstract_object_descriptor()
     {
         //ARRANGE
         var services = new ServiceCollection();
-        services.AddSingleton<Message>();
-        services.AddSingleton<BaseMessageProvider>(new HelloMessageProvider());
+        services.AddSingleton<Letter>();
+        services.AddSingleton(new HelloMessageProvider());
         
         //ACT
-        ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject) =>
-            new MessageProviderDecorator(subject));
+        ServiceDecorator.Decorate<HelloMessageProvider>(services,(subject) =>
+            new HelloMessageProviderDecorator(subject));
 
         var provider = services.BuildServiceProvider();
-        var service =  provider.GetRequiredService<Message>();
-
+        
         //ASSERT
-        service.Content.Should().Be("Decorated: Hello");
+        var service = provider.GetRequiredService<Letter>();
+        service.Content.Should().Be("HelloHello");
     }
 
     [Fact]
@@ -121,9 +121,9 @@ public class ServiceDecoratorTests
     {
         //ARRANGE
         var services = new ServiceCollection();
-        services.AddSingleton<Message>();
-        services.AddSingleton<ExtraText>();
-        services.AddSingleton<BaseMessageProvider, HelloMessageProvider>();
+        services.AddScoped<Message>();
+        services.AddScoped<ExtraText>();
+        services.AddScoped<BaseMessageProvider, HelloMessageProvider>();
 
         //ACT
         ServiceDecorator.Decorate<BaseMessageProvider>(services,(subject, provider) =>
@@ -295,6 +295,15 @@ internal class HelloMessageProviderDecorator : HelloMessageProvider
     }
 }
 
+internal class Letter
+{
+    public string Content { get; }
+
+    public Letter(HelloMessageProvider messageProvider)
+    {
+        Content = messageProvider.GetMessage();
+    }
+}
 internal class Message
 {
     public string Content { get; }
