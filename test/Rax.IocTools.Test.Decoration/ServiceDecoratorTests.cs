@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Rax.IocTools.Decoration;
@@ -42,7 +43,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
-    public void More_then_one_descriptor_per_service_type_should_throw()
+    public void Decorate_abstract_subject_more_then_one_descriptor_per_service_type_should_throw()
     {
         //ARRANGE
         var services = new ServiceCollection();
@@ -57,12 +58,31 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    public void Decorate_non_abstract_object_descriptor()
+    public void Decorate_non_abstract_subject_with_object_descriptor()
     {
         //ARRANGE
         var services = new ServiceCollection();
         services.AddSingleton<Letter>();
         services.AddSingleton(new HelloMessageProvider());
+        
+        //ACT
+        ServiceDecorator.Decorate<HelloMessageProvider>(services,(subject) =>
+            new HelloMessageProviderDecorator(subject));
+
+        var provider = services.BuildServiceProvider();
+        
+        //ASSERT
+        var service = provider.GetRequiredService<Letter>();
+        service.Content.Should().Be("HelloHello");
+    }
+    
+    [Fact]
+    public void Decorate_non_abstract_subject_with_factory_descriptor()
+    {
+        //ARRANGE
+        var services = new ServiceCollection();
+        services.AddSingleton<Letter>();
+        services.AddSingleton(provider => new HelloMessageProvider());
         
         //ACT
         ServiceDecorator.Decorate<HelloMessageProvider>(services,(subject) =>
