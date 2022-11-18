@@ -1,12 +1,14 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: InternalsVisibleTo("Rax.IocTools.Test.Class")]
+[assembly: InternalsVisibleTo("Rax.IocTools.Test")]
+
 namespace Rax.IocTools.Decoration;
+
 internal static class ServiceDecorator
 {
     /// <summary>
-    /// Decorates an injected dependency in Microsoft.DependencyInjection IServiceCollection. See decorator design pattern.
+    ///     Decorates an injected dependency in Microsoft.DependencyInjection IServiceCollection. See decorator design pattern.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="implementationFactory"></param>
@@ -19,7 +21,7 @@ internal static class ServiceDecorator
     }
 
     /// <summary>
-    /// Decorates an injected dependency in Microsoft.DependencyInjection IServiceCollection. See decorator design pattern.
+    ///     Decorates an injected dependency in Microsoft.DependencyInjection IServiceCollection. See decorator design pattern.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="implementationFactory"></param>
@@ -27,12 +29,13 @@ internal static class ServiceDecorator
     public static void Decorate<T>(IServiceCollection services, Func<T, T> implementationFactory)
     {
         var subjectDescriptor = RetrieveSubjectDescriptor<T>(services);
-        var decoratedDescriptor = CreateDecoratedServiceDescriptor(services, FactoryAdapter(implementationFactory), subjectDescriptor);
+        var decoratedDescriptor =
+            CreateDecoratedServiceDescriptor(services, FactoryAdapter(implementationFactory), subjectDescriptor);
         UpdateServiceCollection(services, decoratedDescriptor, subjectDescriptor);
     }
-    
+
     private static ServiceDescriptor CreateDecoratedServiceDescriptor<T>(
-        IServiceCollection services, 
+        IServiceCollection services,
         Func<T, IServiceProvider, T> implementationFactory,
         ServiceDescriptor subjectDescriptor)
     {
@@ -52,7 +55,8 @@ internal static class ServiceDecorator
 
         else if (GenericsDescriptor(subjectDescriptor))
         {
-            newDescriptor = GenericsDecoratorDescriptorCreate(implementationFactory, subjectDescriptor.ImplementationType!, subjectDescriptor.Lifetime);
+            newDescriptor = GenericsDecoratorDescriptorCreate(implementationFactory,
+                subjectDescriptor.ImplementationType!, subjectDescriptor.Lifetime);
             RepointSubjectDescriptor(services, subjectDescriptor.ImplementationType!, subjectDescriptor.Lifetime);
         }
 
@@ -70,34 +74,33 @@ internal static class ServiceDecorator
         catch (Exception e)
         {
             var count = services.Count(x => x.ServiceType == typeof(T));
-            throw new ServiceDecorationException($"To be able to decorate exactly one descriptor is allowed with" +
+            throw new ServiceDecorationException("To be able to decorate exactly one descriptor is allowed with" +
                                                  $" the target service. Target: {typeof(T).Name} count: {count}", e);
         }
 
         if (ImplementationSameAsServiceType(descriptor))
-        {
             throw new ServiceDecorationException(
-                $"You can not decorate a descriptor with same service type as " +
+                "You can not decorate a descriptor with same service type as " +
                 $"implementation. {nameof(ServiceDecorator)}.{nameof(Decorate)} needs abstracted Service Types");
-        }
 
         return descriptor!;
     }
-    
+
     private static Func<T, IServiceProvider, T> FactoryAdapter<T>(Func<T, T> implementationFactory)
     {
-        return ((subject, provider) => implementationFactory(subject));
+        return (subject, provider) => implementationFactory(subject);
     }
-    
+
     private static void UpdateServiceCollection(IServiceCollection services, ServiceDescriptor decoratedDescriptor,
         ServiceDescriptor subjectDescriptor)
     {
         services.Add(decoratedDescriptor);
         services.Remove(subjectDescriptor);
     }
-    
+
     private static ServiceDescriptor FactoryDecoratorDescriptorCreate<T>(
-        Func<T, IServiceProvider, T> decoration, Func<IServiceProvider, object> implementationFactory, ServiceLifetime lifetime)
+        Func<T, IServiceProvider, T> decoration, Func<IServiceProvider, object> implementationFactory,
+        ServiceLifetime lifetime)
     {
         object Factory(IServiceProvider provider)
         {
@@ -107,7 +110,7 @@ internal static class ServiceDecorator
 
         return new ServiceDescriptor(typeof(T), Factory, lifetime);
     }
-    
+
     private static ServiceDescriptor GenericsDecoratorDescriptorCreate<T>(
         Func<T, IServiceProvider, T> decoration, Type implementationType, ServiceLifetime lifetime)
     {
@@ -121,7 +124,7 @@ internal static class ServiceDecorator
     }
 
     private static ServiceDescriptor ObjectDescriptorCreate<T>(
-        Func<T, IServiceProvider, T> decoration, 
+        Func<T, IServiceProvider, T> decoration,
         T instance,
         ServiceLifetime lifetime)
     {
@@ -132,7 +135,7 @@ internal static class ServiceDecorator
 
         return new ServiceDescriptor(typeof(T), Factory, lifetime);
     }
-    
+
     private static T GetRequiredImplementation<T>(IServiceProvider provider, Type implementationType)
     {
         T subject;

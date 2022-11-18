@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rax.IocTools.Decoration", "src\Rax.IocTools.Decoration\Rax.IocTools.Decoration.csproj", "{A9A2148E-E9A6-4282-ADA8-45711F3A16AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rax.IocTools", "src\Rax.IocTools\Rax.IocTools.csproj", "{A9A2148E-E9A6-4282-ADA8-45711F3A16AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rax.IocTools.Test.Class", "test\Rax.IocTools.Test.Class\Rax.IocTools.Test.Class.csproj", "{23205320-C486-444A-A37C-CE464E806A54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rax.IocTools.Test", "test\Rax.IocTools.Test\Rax.IocTools.Test.csproj", "{23205320-C486-444A-A37C-CE464E806A54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
