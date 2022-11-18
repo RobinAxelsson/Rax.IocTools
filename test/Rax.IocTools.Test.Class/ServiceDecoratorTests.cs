@@ -2,13 +2,14 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Rax.IocTools.Decoration;
 
-namespace Rax.IocTools.Test.Decoration;
+namespace Rax.IocTools.Test.Class;
 
 //For more theory see Decorator Design Pattern
 public class ServiceDecoratorTests
 {
 
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_generic_descriptor()
     {
         //ARRANGE
@@ -28,6 +29,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_single_generic_descriptor_should_throw()
     {
         //ARRANGE
@@ -42,6 +44,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_abstract_subject_more_then_one_descriptor_per_service_type_should_throw()
     {
         //ARRANGE
@@ -57,6 +60,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_non_abstract_subject_with_object_descriptor()
     {
         //ARRANGE
@@ -76,6 +80,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_non_abstract_subject_with_factory_descriptor()
     {
         //ARRANGE
@@ -95,6 +100,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_factory_descriptor()
     {
         //ARRANGE
@@ -115,6 +121,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_generic_descriptor_twice_with_new()
     {
         //ARRANGE
@@ -136,6 +143,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_generic_descriptor_with_provider()
     {
         //ARRANGE
@@ -155,6 +163,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_object_descriptor_with_provider()
     {
         //ARRANGE
@@ -173,6 +182,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_factory_descriptor_with_provider()
     {
         //ARRANGE
@@ -191,6 +201,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_provider_factory_descriptor_repeatedly()
     {
         //ARRANGE
@@ -215,6 +226,7 @@ public class ServiceDecoratorTests
     }
     
     [Fact]
+    [Trait("Class test", "Decorate")]
     public void Decorate_generic_descriptor_repeatedly()
     {
         //ARRANGE

@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: InternalsVisibleTo("Rax.IocTools.Test.Decoration")]
+[assembly: InternalsVisibleTo("Rax.IocTools.Test.Class")]
 namespace Rax.IocTools.Decoration;
 internal static class ServiceDecorator
 {
