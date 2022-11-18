@@ -9,7 +9,7 @@ namespace Rax.IocTools.Test.Class;
 public class ServiceDecoratorTests
 {
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_generic_descriptor()
     {
         // Arrange
@@ -28,7 +28,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_single_generic_descriptor_should_throw()
     {
         // Arrange
@@ -43,14 +43,14 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_abstract_subject_more_then_one_descriptor_per_service_type_should_throw()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddScoped<BaseMessageProvider, HelloMessageProvider>();
         services.AddScoped<BaseMessageProvider, MessageProviderDecorator>();
-
+    
         // Act & Assert
         FluentActions.Invoking(
                 () => ServiceDecorator.Decorate<BaseMessageProvider>(services,
@@ -59,7 +59,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_non_abstract_subject_with_object_descriptor()
     {
         // Arrange
@@ -79,7 +79,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_non_abstract_subject_with_factory_descriptor()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_factory_descriptor()
     {
         // Arrange
@@ -120,7 +120,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_generic_descriptor_twice_with_new()
     {
         // Arrange
@@ -142,7 +142,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_generic_descriptor_with_provider()
     {
         // Arrange
@@ -162,7 +162,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_object_descriptor_with_provider()
     {
         // Arrange
@@ -181,7 +181,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_factory_descriptor_with_provider()
     {
         // Arrange
@@ -200,7 +200,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_provider_factory_descriptor_repeatedly()
     {
         // Arrange
@@ -225,7 +225,7 @@ public class ServiceDecoratorTests
     }
 
     [Fact]
-    [Trait(Category.ClassTest, nameof(ServiceDecorator))]
+    [ClassTest(nameof(ServiceDecorator))]
     public void Decorate_generic_descriptor_repeatedly()
     {
         // Arrange
