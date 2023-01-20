@@ -1,8 +1,8 @@
-# Rax.IocTools
+# Bobbysoft.Extensions.DependencyInjection
 
 ## ServiceDecorator
 
-This library class is used to decorate already dependency injected classes inside the Microsoft.DependencyInjection IOC.
+This class library is used to decorate already dependency injected classes inside the Microsoft.DependencyInjection IOC. It is meant to be served as a Nuget package.
 
 ### Example
 ```csharp
@@ -13,7 +13,7 @@ This library class is used to decorate already dependency injected classes insid
 
         var services = new ServiceCollection();
         services.AddTransient<Message>();
-        
+
         //Creates a "generic" descriptor
         services.AddTransient<BaseMessageProvider, HelloMessageProvider>();
 

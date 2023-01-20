@@ -1,18 +1,9 @@
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: InternalsVisibleTo("Rax.IocTools.Test")]
-
-namespace Rax.IocTools.Decoration;
+namespace Bobbysoft.Extensions.DependencyInjection;
 
 internal static class ServiceDecorator
 {
-    /// <summary>
-    ///     Decorates an injected dependency in Microsoft.DependencyInjection IServiceCollection. See decorator design pattern.
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="implementationFactory"></param>
-    /// <typeparam name="T"></typeparam>
     public static void Decorate<T>(IServiceCollection services, Func<T, IServiceProvider, T> implementationFactory)
     {
         var subjectDescriptor = RetrieveSubjectDescriptor<T>(services);
@@ -20,12 +11,6 @@ internal static class ServiceDecorator
         UpdateServiceCollection(services, decoratedDescriptor, subjectDescriptor);
     }
 
-    /// <summary>
-    ///     Decorates an injected dependency in Microsoft.DependencyInjection IServiceCollection. See decorator design pattern.
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="implementationFactory"></param>
-    /// <typeparam name="T">The abstraction to decorate</typeparam>
     public static void Decorate<T>(IServiceCollection services, Func<T, T> implementationFactory)
     {
         var subjectDescriptor = RetrieveSubjectDescriptor<T>(services);
@@ -80,8 +65,8 @@ internal static class ServiceDecorator
 
         if (ImplementationSameAsServiceType(descriptor))
             throw new ServiceDecorationException(
-                "You can not decorate a descriptor with same service type as " +
-                $"implementation. {nameof(ServiceDecorator)}.{nameof(Decorate)} needs abstracted Service Types");
+                "You must not decorate a descriptor with same service type as " +
+                $"implementation, you can only decorate an abstracted type");
 
         return descriptor!;
     }

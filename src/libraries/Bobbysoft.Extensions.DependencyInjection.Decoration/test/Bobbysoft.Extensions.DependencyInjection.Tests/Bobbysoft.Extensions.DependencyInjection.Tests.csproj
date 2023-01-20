@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Rax.IocTools\Rax.IocTools.csproj" />
+      <ProjectReference Include="..\..\src\Bobbysoft.Extensions.DependencyInjection.Decoration.csproj" />
     </ItemGroup>
 
 </Project>

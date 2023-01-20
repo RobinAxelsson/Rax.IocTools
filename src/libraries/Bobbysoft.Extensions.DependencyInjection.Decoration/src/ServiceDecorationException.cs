@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
-namespace Rax.IocTools.Decoration;
+namespace Bobbysoft.Extensions.DependencyInjection;
 
 [ExcludeFromCodeCoverage]
 public class ServiceDecorationException : Exception
