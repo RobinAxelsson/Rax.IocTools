@@ -4,14 +4,14 @@ namespace Bobbysoft.Extensions.DependencyInjection;
 
 internal static class ServiceDecorator
 {
-    public static void Decorate<T>(IServiceCollection services, Func<T, IServiceProvider, T> implementationFactory)
+    public static void Decorate<T>(this IServiceCollection services, Func<T, IServiceProvider, T> implementationFactory)
     {
         var subjectDescriptor = RetrieveSubjectDescriptor<T>(services);
         var decoratedDescriptor = CreateDecoratedServiceDescriptor(services, implementationFactory, subjectDescriptor);
         UpdateServiceCollection(services, decoratedDescriptor, subjectDescriptor);
     }
 
-    public static void Decorate<T>(IServiceCollection services, Func<T, T> implementationFactory)
+    public static void Decorate<T>(this IServiceCollection services, Func<T, T> implementationFactory)
     {
         var subjectDescriptor = RetrieveSubjectDescriptor<T>(services);
         var decoratedDescriptor =
